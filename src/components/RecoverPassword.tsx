@@ -2,29 +2,29 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Logo from '@/components/Logo' // Importamos el componente Logo
+import Logo from '@/components/Logo'
 
 export default function RecoverPassword() {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState<string | null>(null)
   const [messageType, setMessageType] = useState<'success' | 'error' | null>(null)
-  const router = useRouter()  // Para manejar la navegación
+  const router = useRouter()
 
-  const handleChange = (e: { target: { value: any; }; }) => {
+  // Change the type of the event to React.ChangeEvent<HTMLInputElement>
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
   }
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validar que el correo no esté vacío
+    // Validate that the email is not empty
     if (!email) {
       setMessage('Por favor ingresa un correo electrónico.')
       setMessageType('error')
       return
     }
 
-    // Llamada a la API para verificar el correo
     try {
       const response = await fetch('/api/auth/recover-password', {
         method: 'POST',
@@ -41,18 +41,18 @@ export default function RecoverPassword() {
         setMessage(result.message || 'Error al verificar el correo.')
         setMessageType('error')
       }
-    } catch (error) {
+    } catch {
       setMessage('Hubo un error en el proceso. Por favor, intenta más tarde.')
       setMessageType('error')
     }
   }
 
   const handleGoBack = () => {
-    router.push('/login') // Volver al inicio de sesión
+    router.push('/login') // Go back to login page
   }
 
   const handleGoHome = () => {
-    router.push('/') // Volver al inicio (splash screen)
+    router.push('/') // Go to home page (splash screen)
   }
 
   return (
@@ -93,7 +93,6 @@ export default function RecoverPassword() {
           </div>
         </form>
 
-        {/* Opciones para regresar */}
         <div className="flex justify-between mt-4">
           <button
             onClick={handleGoBack}

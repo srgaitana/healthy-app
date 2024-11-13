@@ -1,6 +1,9 @@
+import { useStore } from '@/store/useStore'
+
 function Footer() {
+  const { isProfessional} = useStore()
     return (
-      <footer className="bg-gray-100 text-gray-600">
+      <footer className={`ml-3 text-xl font-semibold ${isProfessional ? 'text-green-800' : 'text-blue-800'}`}>
         <div className="container mx-auto px-6 py-8">
           <div className="flex flex-wrap justify-between">
             <div className="w-full md:w-1/4 mb-6 md:mb-0">

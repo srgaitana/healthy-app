@@ -1,5 +1,3 @@
-export const dynamic = "force-static";
-
 import pool from '@/lib/db';   
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
@@ -36,6 +34,17 @@ interface DecodedToken {
   exp: number;
 }
 
+// Definir el tipo para los datos de usuario
+interface UserData {
+  UserID: number;
+  FirstName: string;
+  LastName: string;
+  Email: string;
+  PhoneNumber?: string;
+  DateOfBirth?: string;
+  Role: string;
+}
+
 export async function GET(req: NextRequest): Promise<NextResponse<UserResponse>> {
   try {
     const authHeader = req.headers.get('Authorization');
@@ -67,7 +76,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<UserResponse>>
       }
     
       userID = decodedToken.user.userID;
-    } catch (error) {
+    } catch {
       return NextResponse.json(
         { message: 'Token no válido o expirado.', removeToken: true },
         { status: 403 }
@@ -81,7 +90,8 @@ export async function GET(req: NextRequest): Promise<NextResponse<UserResponse>>
       [userID]
     );
 
-    const user = (userData as any[])[0];
+    // Castear el resultado a un tipo más específico en lugar de 'any'
+    const user = (userData as UserData[])[0];  // Aquí casteamos a UserData[]
 
     if (!user) {
       return NextResponse.json(
@@ -118,7 +128,7 @@ export async function GET(req: NextRequest): Promise<NextResponse<UserResponse>>
   } catch (error: unknown) {
     console.error('Error al obtener los datos del usuario:', error);
 
-    // Verificación más explícita del tipo de error
+    // Comprobación explícita del tipo de error
     const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json({
       message: 'Error en el servidor.',

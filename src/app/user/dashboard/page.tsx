@@ -10,8 +10,6 @@ import {
   X, 
   LogOut, 
   Clock, 
-  FileText, 
-  Heart,
   Bell,
   Settings,
   MessageSquare,

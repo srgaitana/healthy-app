@@ -13,7 +13,7 @@ const Logo: React.FC<LogoProps> = ({
   lineColor = '#F9F9F9', // Valor predeterminado para color de la línea
 }) => {
   // Determina el color de fondo basado en el valor de `color`
-  const backgroundColor = color === 'green' ? '#3BF682' : color === 'blue' ? '#3B82F6' : color;
+  const backgroundColor = color === 'green' ? '#16a34a' : color === 'blue' ? '#3B82F6' : color;
 
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">

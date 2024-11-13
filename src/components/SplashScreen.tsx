@@ -90,7 +90,7 @@ export default function SplashScreen() {
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen transition-colors duration-700 ${
-      isProfessional ? 'bg-gradient-to-b from-green-100 to-green-300' : 'bg-gradient-to-b from-blue-100 to-white'
+      isProfessional ? 'bg-gradient-to-b from-green-100 to-green-300' : 'bg-gradient-to-b from-blue-100 to-blue-300'
     } p-4 lg:p-8`}>
       <div className="w-full max-w-md lg:max-w-7xl">
         <div className="text-center mb-8">

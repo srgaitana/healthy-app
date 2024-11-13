@@ -36,7 +36,7 @@ export default function Login() {
     }
   }, [router, isProfessional]);
 
-  const handleChange = (e: { target: { id: any; value: any; }; }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
   };
@@ -100,7 +100,7 @@ export default function Login() {
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${isProfessional ? 'bg-gradient-to-b from-green-100 to-white' : 'bg-gradient-to-b from-blue-100 to-white'}`}>
+    <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${isProfessional ? 'bg-gradient-to-b from-green-100 to-green-300' : 'bg-gradient-to-b from-blue-100 to-blue-300'}`}>
       <div className="w-full max-w-md">
         <div className="text-center mb-8 justify-items-center">
           <Logo size={100} color={isProfessional ? 'green' : 'blue'} />

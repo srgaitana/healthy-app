@@ -4,8 +4,9 @@
 import React from 'react'
 import Header from "@/components/Header"
 import Footer from "@/components/Footer"
-import Register from "@/components/Register"
 import { useStore } from '@/store/useStore'
+import PatientRegister from '@/components/PatientRegister'
+import ProfessionalHealthcareRegister from '@/components/ProfessionalHealthcareRegister'
 
 export default function RegisterPage() {
   const { isProfessional } = useStore()
@@ -20,7 +21,7 @@ export default function RegisterPage() {
           ? 'bg-gradient-to-b from-green-100 to-green-300' 
           : 'bg-gradient-to-b from-blue-100 to-white'
       }`}>
-        <Register />
+        {isProfessional ? <ProfessionalHealthcareRegister /> : <PatientRegister />}
       </main>
       <div className="hidden lg:block">
         <Footer />

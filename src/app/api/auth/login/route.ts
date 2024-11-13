@@ -26,18 +26,27 @@ interface LoginResponse {
   token?: string;
 }
 
+interface User {
+  UserID: number;
+  Email: string;
+  PasswordHash: string;
+  FirstName: string;
+  LastName: string;
+  Role: string;
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse<LoginResponse>> {
   try {
     const body = await req.json();
     const validatedData = LoginSchema.parse(body);
     const { email, password } = validatedData;
 
-    const [users] = await pool.promise().execute(
-      'SELECT * FROM Users WHERE Email = ?',
-      [email]
-    );
+const [users] = await pool.promise().execute(
+  'SELECT * FROM Users WHERE Email = ?',
+  [email]
+);
 
-    const user = (users as any[])[0];
+const user = (users as User[])[0];
 
     if (!user) {
       return NextResponse.json(
@@ -82,19 +91,26 @@ export async function POST(req: NextRequest): Promise<NextResponse<LoginResponse
       token,
     }, { status: 200 });
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error durante el login:', error);
-
+  
     if (error instanceof z.ZodError) {
       return NextResponse.json({
         message: 'Datos de entrada inválidos',
         error: error.errors[0].message
       }, { status: 400 });
     }
-
+  
+    if (error instanceof Error) {
+      return NextResponse.json({
+        message: 'Error en el servidor.',
+        error: error.message
+      }, { status: 500 });
+    }
+  
     return NextResponse.json({
       message: 'Error en el servidor.',
-      error: error.message
+      error: 'Error desconocido'
     }, { status: 500 });
-  }
+  }  
 }

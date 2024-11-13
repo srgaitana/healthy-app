@@ -1,4 +1,5 @@
 // types/next.d.ts
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextRequest } from 'next/server';
 
 declare module 'next/server' {

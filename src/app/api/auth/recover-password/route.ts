@@ -1,31 +1,45 @@
-// /app/api/auth/recover-password/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';  // Asegúrate de tener la conexión a la base de datos correctamente configurada
+import pool from '@/lib/db';  // Ensure your database connection is properly configured
+
+// Define the User type
+interface User {
+  UserID: number;
+  Email: string;
+  PasswordHash: string;
+  FirstName: string;
+  LastName: string;
+  Role: string;
+}
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
 
-  // Validación de que el correo electrónico esté presente
+  // Validate that the email is provided
   if (!email) {
     return NextResponse.json({ message: 'Por favor ingresa un correo electrónico.' }, { status: 400 });
   }
 
   try {
-    // Consultar si el correo electrónico existe en la base de datos
-    const [user] = await pool.promise().execute(
+    // Query the database to check if the email exists
+    const [users] = await pool.promise().execute(
       `SELECT * FROM Users WHERE Email = ?`,
       [email]
     );
 
-    // Si no se encuentra el usuario, enviar un mensaje de error
-    if ((user as any).length === 0) {
+    // Ensure the result is typed as an array of users
+    const user = (users as User[])[0]; // Get the first user (or undefined)
+
+    // If no user is found, return an error message
+    if (!user) {
       return NextResponse.json({ message: 'No se encuentra ningún usuario con ese correo electrónico.' }, { status: 404 });
     }
 
-    // Si el correo está registrado, devolver un mensaje de éxito
+    // If the email exists, return a success message
     return NextResponse.json({ message: 'Correo verificado. Ahora puedes proceder con la recuperación de contraseña.' }, { status: 200 });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error al verificar el correo:', error);
+
+    // Handle unexpected errors gracefully
     return NextResponse.json({ message: 'Hubo un error al procesar tu solicitud. Intenta de nuevo más tarde.' }, { status: 500 });
   }
 }

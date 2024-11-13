@@ -55,14 +55,6 @@ const ProfessionalDashboard: React.FC = () => {
     router.push('/login')
   }
 
-  const checkProfessionalRole = (role: string) => {
-    if (role !== 'Healthcare Professional') {
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      router.push('/login')
-    }
-  }
-
   useEffect(() => {
     const checkToken = () => {
       const token = localStorage.getItem('token')
@@ -72,26 +64,26 @@ const ProfessionalDashboard: React.FC = () => {
       }
       return true
     }
-
+  
     if (!checkToken()) {
       return
     }
-
+  
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token')
         if (!token) {
           throw new Error('No se encontró token de autenticación')
         }
-
+  
         const response = await fetch('/api/user', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
         })
-
+  
         const data = await response.json()
-
+  
         if (!response.ok) {
           if (response.status === 401) {
             localStorage.removeItem('token')
@@ -99,9 +91,15 @@ const ProfessionalDashboard: React.FC = () => {
           }
           throw new Error(data.message || 'Error al obtener datos del usuario')
         }
-
+  
         setUser(data.user)
-        checkProfessionalRole(data.user.role)
+        
+        // Directly call checkProfessionalRole inline here:
+        if (data.user.role !== 'Healthcare Professional') {
+          localStorage.removeItem('token')
+          localStorage.removeItem('user')
+          router.push('/login')
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Ocurrió un error inesperado'
         setError(errorMessage)
@@ -114,9 +112,10 @@ const ProfessionalDashboard: React.FC = () => {
         setLoading(false)
       }
     }
-
+  
     fetchUserData()
-  }, [router])
+  }, [router])  // No need to add checkProfessionalRole to dependencies
+  
 
   if (loading) {
     return (

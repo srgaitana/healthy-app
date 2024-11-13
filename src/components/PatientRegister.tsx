@@ -1,6 +1,5 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import Logo from './Logo';
-import { useStore } from '../store/useStore';
 import { useRouter } from 'next/navigation';
 
 interface FormData {
@@ -10,27 +9,23 @@ interface FormData {
   password: string;
   phoneNumber: string;
   dateOfBirth: string;
-  licenseNumber?: string;
-  specialty?: string;
-  education?: string;
-  consultationFee?: string;
+  gender: string;
+  customGender: string;
 }
 
-interface Errors {
+// Define a type for the error object
+interface FormErrors {
   firstName?: string;
   lastName?: string;
   email?: string;
   password?: string;
   phoneNumber?: string;
   dateOfBirth?: string;
-  licenseNumber?: string;
-  specialty?: string;
-  education?: string;
-  consultationFee?: string;
+  gender?: string;
+  customGender?: string;
 }
 
-export default function Register() {
-  const { isProfessional, toggleProfessional } = useStore();
+export default function PatientRegister() {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
@@ -38,46 +33,37 @@ export default function Register() {
     password: '',
     phoneNumber: '',
     dateOfBirth: '',
-    licenseNumber: '',
-    specialty: '',
-    education: '',
-    consultationFee: ''
+    gender: 'other',
+    customGender: '',
   });
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<'success' | 'error' | null>(null);
-  const [errors, setErrors] = useState<Errors>({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
   };
 
-  const validateForm = (): Errors => {
-    const errors: Errors = {};
-    // Validaciones de los campos
+  const validateForm = (): FormErrors => {
+    const errors: FormErrors = {};
     if (!formData.firstName) errors.firstName = 'El nombre es obligatorio';
     if (!formData.lastName) errors.lastName = 'El apellido es obligatorio';
     if (!formData.email) errors.email = 'El correo es obligatorio';
     if (!formData.password) errors.password = 'La contraseña es obligatoria';
     if (!formData.phoneNumber) errors.phoneNumber = 'El número de teléfono es obligatorio';
     if (!formData.dateOfBirth) errors.dateOfBirth = 'La fecha de nacimiento es obligatoria';
-
-    // Si es un profesional de la salud, validamos los campos adicionales
-    if (isProfessional) {
-      if (!formData.licenseNumber) errors.licenseNumber = 'El número de licencia es obligatorio';
-      if (!formData.specialty) errors.specialty = 'La especialidad es obligatoria';
-      if (!formData.education) errors.education = 'La educación es obligatoria';
-      if (!formData.consultationFee) errors.consultationFee = 'La tarifa de consulta es obligatoria';
+    if (!formData.gender) errors.gender = 'El género es obligatorio';
+    if (formData.gender === 'Otro' && !formData.customGender) {
+      errors.customGender = 'Por favor, especifica tu género';
     }
-
     return errors;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validamos el formulario
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
@@ -86,21 +72,14 @@ export default function Register() {
       return;
     }
 
-    const { firstName, lastName, email, password, phoneNumber, dateOfBirth, licenseNumber, specialty, education, consultationFee } = formData;
-
     const userPayload = {
-      firstName,
-      lastName,
-      email,
-      password,
-      phoneNumber,
-      dateOfBirth,
-      role: isProfessional ? 'Healthcare Professional' : 'Patient',
-      ...(isProfessional && { licenseNumber, specialty, education, consultationFee })
+      ...formData,
+      role: 'Patient',
+      gender: formData.gender === 'Otro' ? 'other' : formData.gender.toLowerCase(),
+      genderIdentity: formData.gender === 'Otro' ? formData.customGender : null,
     };
-
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('/api/auth/register/patient', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userPayload)
@@ -112,52 +91,34 @@ export default function Register() {
         setMessage('Registro exitoso. Ahora puedes iniciar sesión.');
         setMessageType('success');
         setTimeout(() => {
-          router.push(isProfessional ? '/login?isProfessional=true' : '/login?isProfessional=false');
-        }, 3000); // Redirigir al login después de 3 segundos
+          router.push('/login?isProfessional=false');
+        }, 3000);
       } else {
-        // Si la respuesta del servidor no es exitosa, mostramos un mensaje de error
         setMessage(result.message || 'Error en el registro');
         setMessageType('error');
       }
     } catch (error) {
-      if (error instanceof Error) {
-        // Error al hacer la solicitud de red
-        console.error('Error en la solicitud de registro:', error.message);
-        setMessage('Hubo un error al procesar la solicitud. Intenta de nuevo más tarde.');
-      } else {
-        // Error desconocido
-        console.error('Error desconocido:', error);
-        setMessage('Error desconocido. Por favor, intenta más tarde.');
-      }
+      console.error('Error en la solicitud de registro:', error);
+      setMessage('Hubo un error al procesar la solicitud. Intenta de nuevo más tarde.');
       setMessageType('error');
     }
   };
 
   const handleGoBack = () => {
-    router.push('/'); // Redirigir a la página principal (inicio)
+    router.push('/');
   };
 
   return (
-    <div className={`flex flex-col items-center justify-center min-h-screen p-4 ${isProfessional ? 'bg-gradient-to-b from-green-100 to-white' : 'bg-gradient-to-b from-blue-100 to-white'}`}>
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-b from-blue-100 to-blue-300">
       <div className="w-full max-w-md">
         <div className="text-center mb-8 justify-items-center">
-          <Logo size={100} color={isProfessional ? 'green' : 'blue'} />
-          <h1 className={`text-3xl font-bold ${isProfessional ? 'text-green-600' : 'text-blue-600'} mt-4`}>
-            {isProfessional ? 'Registro Profesional' : 'Registro Paciente'}
+          <Logo size={100} color="blue" />
+          <h1 className="text-3xl font-bold text-blue-600 mt-4">
+            Registro Paciente
           </h1>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
-          {/* Botón para alternar entre usuario y profesional */}
-          <div className="mb-4 text-center">
-            <button
-              onClick={toggleProfessional}
-              className={`w-full py-2 px-4 rounded text-white font-bold ${isProfessional ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
-            >
-              {isProfessional ? '¿Eres un paciente?' : '¿Eres un profesional de la salud?'}
-            </button>
-          </div>
-
           {message && (
             <div className={`mb-6 text-center p-3 rounded-lg ${messageType === 'success' ? 'bg-green-200' : 'bg-red-200'}`}>
               <p className={`text-sm font-bold ${messageType === 'success' ? 'text-green-700' : 'text-red-700'}`}>{message}</p>
@@ -194,6 +155,41 @@ export default function Register() {
               />
               {errors.lastName && <p className="text-red-500 text-xs italic">{errors.lastName}</p>}
             </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="gender">
+                Género
+              </label>
+              <select
+                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.gender ? 'border-red-500' : ''}`}
+                id="gender"
+                value={formData.gender}
+                onChange={handleChange}
+              >
+                <option value="">Seleccione una opción</option>
+                <option value="Masculino">Masculino</option>
+                <option value="Femenino">Femenino</option>
+                <option value="Otro">Otro</option>
+              </select>
+              {errors.gender && <p className="text-red-500 text-xs italic">{errors.gender}</p>}
+            </div>
+
+            {formData.gender === 'Otro' && (
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="customGender">
+                  Especificar Género
+                </label>
+                <input
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.customGender ? 'border-red-500' : ''}`}
+                  id="customGender"
+                  type="text"
+                  value={formData.customGender}
+                  onChange={handleChange}
+                  placeholder="Ingrese su género"
+                />
+                {errors.customGender && <p className="text-red-500 text-xs italic">{errors.customGender}</p>}
+              </div>
+            )}
 
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="email">
@@ -254,80 +250,18 @@ export default function Register() {
               {errors.dateOfBirth && <p className="text-red-500 text-xs italic">{errors.dateOfBirth}</p>}
             </div>
 
-            {isProfessional && (
-              <>
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="licenseNumber">
-                    Número de Licencia
-                  </label>
-                  <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.licenseNumber ? 'border-red-500' : ''}`}
-                    id="licenseNumber"
-                    type="text"
-                    value={formData.licenseNumber}
-                    onChange={handleChange}
-                    placeholder="Número de licencia"
-                  />
-                  {errors.licenseNumber && <p className="text-red-500 text-xs italic">{errors.licenseNumber}</p>}
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="specialty">
-                    Especialidad
-                  </label>
-                  <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.specialty ? 'border-red-500' : ''}`}
-                    id="specialty"
-                    type="text"
-                    value={formData.specialty}
-                    onChange={handleChange}
-                    placeholder="Especialidad médica"
-                  />
-                  {errors.specialty && <p className="text-red-500 text-xs italic">{errors.specialty}</p>}
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="education">
-                    Educación
-                  </label>
-                  <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.education ? 'border-red-500' : ''}`}
-                    id="education"
-                    type="text"
-                    value={formData.education}
-                    onChange={handleChange}
-                    placeholder="Institución educativa"
-                  />
-                  {errors.education && <p className="text-red-500 text-xs italic">{errors.education}</p>}
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="consultationFee">
-                    Tarifa de Consulta
-                  </label>
-                  <input
-                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.consultationFee ? 'border-red-500' : ''}`}
-                    id="consultationFee"
-                    type="text"
-                    value={formData.consultationFee}
-                    onChange={handleChange}
-                    placeholder="Costo de la consulta"
-                  />
-                  {errors.consultationFee && <p className="text-red-500 text-xs italic">{errors.consultationFee}</p>}
-                </div>
-              </>
-            )}
-
             <button
               type="submit"
-              className={`w-full py-2 px-4 rounded text-white font-bold ${isProfessional ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'}`}
+              className="w-full py-2 px-4 rounded text-white font-bold bg-blue-600 hover:bg-blue-700"
             >
               Registrar
             </button>
           </form>
 
           <div className="text-center mt-4">
-            <button onClick={handleGoBack} className="text-sm text-blue-600 hover:underline">Volver a la página principal</button>
+            <button onClick={handleGoBack} className="text-sm text-blue-600 hover:underline">
+              Volver a la página principal
+            </button>
           </div>
         </div>
       </div>

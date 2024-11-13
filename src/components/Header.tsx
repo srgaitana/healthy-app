@@ -8,7 +8,7 @@ function Header() {
   const router = useRouter()
 
   return (
-    <header className="bg-white shadow-md">
+    <header className={`${isProfessional ? 'bg-green-200' : 'bg-blue-200'}`}>
       <nav className="container mx-auto px-6 py-3">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
