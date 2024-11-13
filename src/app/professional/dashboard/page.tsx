@@ -14,7 +14,8 @@ import {
   Clock, 
   FileText, 
   DollarSign,
-  Bell
+  Bell,
+  Plus
 } from 'lucide-react'
 
 interface User {
@@ -164,19 +165,19 @@ const ProfessionalDashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-green-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-green-50 to-teal-100">
       {/* Sidebar for desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-white shadow-lg">
-        <div className="p-4 bg-green-600">
-          <Logo size={40} color="white" lineColor='#3bf682'/>
-          <h1 className=''>Healthy App</h1>
+      <aside className="hidden md:flex flex-col w-64 bg-white bg-opacity-80 backdrop-blur-lg shadow-lg">
+        <div className="flex gap-4 p-4 bg-gradient-to-r from-green-600 to-teal-600">
+          <Logo size={40} color="white" lineColor='#16a34a'/>
+          <h1 className='text-white text-2xl font-semibold'>Healthy App</h1>
         </div>
         <nav className="flex-1 overflow-y-auto">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveMenuItem(item.id)}
-              className={`flex items-center w-full px-4 py-3 text-left ${
+              className={`flex items-center w-full px-4 py-3 text-left transition-colors duration-200 ${
                 activeMenuItem === item.id ? 'bg-green-100 text-green-800' : 'text-gray-600 hover:bg-green-50'
               }`}
             >
@@ -187,7 +188,7 @@ const ProfessionalDashboard: React.FC = () => {
         </nav>
         <button 
           onClick={handleLogout}
-          className="flex items-center px-4 py-3 bg-red-600 text-white hover:bg-red-700 transition duration-200"
+          className="m-4 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
         >
           <LogOut className="h-5 w-5 mr-3" />
           Cerrar Sesión
@@ -197,12 +198,12 @@ const ProfessionalDashboard: React.FC = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Header for mobile */}
-        <header className="md:hidden bg-green-600 text-white p-4 shadow-md">
+        <header className="md:hidden bg-gradient-to-r from-green-600 to-teal-600 text-white p-4 shadow-md">
           <div className="flex justify-between items-center">
-          <Logo size={40} color="white" lineColor='#3bf682'/>
-            <button 
+            <Logo size={40} color="white" lineColor='#3bf682'/>
+            <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50 rounded-lg p-1"
+              className="text-white hover:bg-green-700 p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-white focus:ring-opacity-50"
             >
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -211,7 +212,7 @@ const ProfessionalDashboard: React.FC = () => {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden bg-white shadow-lg absolute top-16 left-0 right-0 z-20">
+          <div className="md:hidden bg-white bg-opacity-90 backdrop-blur-lg shadow-lg absolute top-16 left-0 right-0 z-20">
             <nav>
               {menuItems.map((item) => (
                 <button
@@ -220,8 +221,8 @@ const ProfessionalDashboard: React.FC = () => {
                     setActiveMenuItem(item.id)
                     setMenuOpen(false)
                   }}
-                  className={`flex items-center w-full px-4 py-3 text-left ${
-                    activeMenuItem === item.id ? 'bg-green-100 text-green-800' : 'text-gray-600'
+                  className={`flex items-center w-full px-4 py-3 text-left transition-colors duration-200 ${
+                    activeMenuItem === item.id ? 'bg-green-100 text-green-800' : 'text-gray-600 hover:bg-green-50'
                   }`}
                 >
                   <item.icon className="h-5 w-5 mr-3" />
@@ -230,7 +231,7 @@ const ProfessionalDashboard: React.FC = () => {
               ))}
               <button 
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 bg-red-600 text-white"
+                className="w-full py-3 px-4 bg-red-600 text-white hover:bg-red-700 transition duration-300 flex items-center justify-center"
               >
                 <LogOut className="h-5 w-5 mr-3" />
                 Cerrar Sesión
@@ -241,14 +242,14 @@ const ProfessionalDashboard: React.FC = () => {
 
         {/* Main content area */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <h1 className="text-2xl font-bold text-green-800 mb-6">
+          <h1 className="text-3xl font-bold text-green-800 mb-6">
             Bienvenido, Dr. {user.lastName}
           </h1>
           
           {/* Dashboard content */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Próximas Citas */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-green-700 mb-4">Próximas Citas</h2>
               {user.appointments.length > 0 ? (
                 <ul className="space-y-4">
@@ -288,7 +289,7 @@ const ProfessionalDashboard: React.FC = () => {
             </div>
             
             {/* Resumen */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-green-700 mb-4">Resumen</h2>
               <div className="space-y-3">
                 <div>
@@ -316,17 +317,17 @@ const ProfessionalDashboard: React.FC = () => {
             </div>
             
             {/* Acciones Rápidas */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold text-green-700 mb-4">Acciones Rápidas</h2>
               <div className="space-y-3">
-                <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-200 font-medium">
-                  Agendar Nueva Cita
+                <button className="w-full py-2 px-4 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition duration-300 font-medium flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                  <Plus className="mr-2 h-4 w-4" /> Agendar Nueva Cita
                 </button>
-                <button className="w-full bg-green-100 text-green-800 py-2 px-4 rounded-lg hover:bg-green-200 transition duration-200 font-medium">
-                  Ver Todos los Pacientes
+                <button className="w-full py-2 px-4 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition duration-300 font-medium flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                  <Users className="mr-2 h-4 w-4" /> Ver Todos los Pacientes
                 </button>
-                <button className="w-full border border-green-600 text-green-600 py-2 px-4 rounded-lg hover:bg-green-50 transition duration-200 font-medium">
-                  Gestionar Disponibilidad
+                <button className="w-full py-2 px-4 border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition duration-300 font-medium flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                  <Clock className="mr-2 h-4 w-4" /> Gestionar Disponibilidad
                 </button>
               </div>
             </div>

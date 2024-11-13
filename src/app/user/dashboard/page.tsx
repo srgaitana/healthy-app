@@ -14,7 +14,10 @@ import {
   Settings,
   MessageSquare,
   CreditCard,
-  Star
+  Star,
+  Plus,
+  Search,
+  Edit
 } from 'lucide-react'
 
 interface UserData {
@@ -136,7 +139,7 @@ const UserDashboard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col min-h-screen items-center justify-center bg-blue-50">
+      <div className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="animate-pulse flex flex-col items-center">
           <div className="rounded-full bg-blue-400 h-20 w-20 mb-4"></div>
           <div className="h-4 bg-blue-400 rounded w-3/4 mb-2"></div>
@@ -148,13 +151,13 @@ const UserDashboard: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex flex-col min-h-screen items-center justify-center bg-blue-50 p-4">
+      <div className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
         <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold mb-4 text-center text-red-800">Error</h2>
           <p className="text-center text-gray-600 mb-6">{error}</p>
           <button 
             onClick={() => router.push('/login')}
-            className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-semibold"
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 text-lg font-semibold"
           >
             Volver al inicio de sesión
           </button>
@@ -165,13 +168,13 @@ const UserDashboard: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="flex flex-col min-h-screen items-center justify-center bg-blue-50 p-4">
+      <div className="flex flex-col min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
         <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
           <h2 className="text-2xl font-bold mb-4 text-center text-blue-800">Error</h2>
           <p className="text-center text-gray-600 mb-6">No se pudo encontrar la información del usuario.</p>
           <button 
             onClick={() => router.push('/login')}
-            className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 text-lg font-semibold"
+            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 text-lg font-semibold"
           >
             Volver al inicio de sesión
           </button>
@@ -181,18 +184,19 @@ const UserDashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-blue-50">
+    <div className="flex min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Sidebar for desktop */}
-      <aside className="hidden md:flex flex-col w-64 bg-white shadow-lg">
-        <div className="p-4 bg-blue-600">
-          <Logo size={40} color="white" />
+      <aside className="hidden md:flex flex-col w-64 bg-white bg-opacity-80 backdrop-blur-lg shadow-lg">
+      <div className="flex gap-4 p-4 bg-gradient-to-r from-blue-600 to-indigo-600">
+        <Logo size={40} color="white" lineColor='#3b82f6'/>
+          <h1 className='text-white text-2xl font-semibold'>Healthy App</h1>
         </div>
         <nav className="flex-1 overflow-y-auto">
           {menuItems.map((item) => (
             <button
               key={item.id}
               onClick={() => setActiveMenuItem(item.id)}
-              className={`flex items-center w-full px-4 py-3 text-left ${
+              className={`flex items-center w-full px-4 py-3 text-left transition-colors duration-200 ${
                 activeMenuItem === item.id ? 'bg-blue-100 text-blue-800' : 'text-gray-600 hover:bg-blue-50'
               }`}
             >
@@ -203,7 +207,7 @@ const UserDashboard: React.FC = () => {
         </nav>
         <button 
           onClick={handleLogout}
-          className="flex items-center px-4 py-3 bg-red-600 text-white hover:bg-red-700 transition duration-200"
+          className="m-4 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300 flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
         >
           <LogOut className="h-5 w-5 mr-3" />
           Cerrar Sesión
@@ -213,7 +217,7 @@ const UserDashboard: React.FC = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col">
         {/* Header for mobile */}
-        <header className="md:hidden bg-blue-600 text-white p-4 shadow-md">
+        <header className="md:hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 shadow-md">
           <div className="flex justify-between items-center">
             <Logo size={32} color="white" />
             <button 
@@ -227,7 +231,7 @@ const UserDashboard: React.FC = () => {
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden bg-white shadow-lg absolute top-16 left-0 right-0 z-20">
+          <div className="md:hidden bg-white bg-opacity-90 backdrop-blur-lg shadow-lg absolute top-16 left-0 right-0 z-20">
             <nav>
               {menuItems.map((item) => (
                 <button
@@ -236,8 +240,8 @@ const UserDashboard: React.FC = () => {
                     setActiveMenuItem(item.id)
                     setMenuOpen(false)
                   }}
-                  className={`flex items-center w-full px-4 py-3 text-left ${
-                    activeMenuItem === item.id ? 'bg-blue-100 text-blue-800' : 'text-gray-600'
+                  className={`flex items-center w-full px-4 py-3 text-left transition-colors duration-200 ${
+                    activeMenuItem === item.id ? 'bg-blue-100 text-blue-800' : 'text-gray-600 hover:bg-blue-50'
                   }`}
                 >
                   <item.icon className="h-5 w-5 mr-3" />
@@ -246,7 +250,7 @@ const UserDashboard: React.FC = () => {
               ))}
               <button 
                 onClick={handleLogout}
-                className="flex items-center w-full px-4 py-3 bg-red-600 text-white"
+                className="flex items-center w-full px-4 py-3 bg-red-600 text-white hover:bg-red-700 transition duration-200"
               >
                 <LogOut className="h-5 w-5 mr-3" />
                 Cerrar Sesión
@@ -257,13 +261,13 @@ const UserDashboard: React.FC = () => {
 
         {/* Main content area */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto">
-          <h1 className="text-2xl font-bold text-blue-800 mb-6">
+          <h1 className="text-3xl font-bold text-blue-800 mb-6">
             Bienvenido, {user.firstName} {user.lastName}
           </h1>
           {/* Dashboard content */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Próximas Citas */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-blue-700 mb-4">Próximas Citas</h2>
               {appointments.length > 0 ? (
                 <ul className="space-y-4">
@@ -299,13 +303,14 @@ const UserDashboard: React.FC = () => {
               ) : (
                 <p className="text-gray-600">No tienes citas programadas.</p>
               )}
-              <button className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+              <button className="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 font-medium flex items-center justify-center">
+                <Clock className="mr-2 h-4 w-4" />
                 Ver todas las citas
               </button>
             </div>
             
             {/* Resumen de Salud */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-blue-700 mb-4">Resumen de Salud</h2>
               <div className="space-y-3">
                 <div>
@@ -338,29 +343,33 @@ const UserDashboard: React.FC = () => {
                   <p className="font-medium text-gray-800">{appointments.length}</p>
                 </div>
               </div>
-              <button className="mt-4 w-full bg-blue-100 text-blue-800 py-2 px-4 rounded-lg hover:bg-blue-200 transition duration-200 font-medium">
+              <button className="mt-4 w-full bg-blue-100 text-blue-800 py-2 px-4 rounded-lg hover:bg-blue-200 transition duration-300 font-medium flex items-center justify-center">
+                <Calendar className="mr-2 h-4 w-4" />
                 Ver historial de citas
               </button>
             </div>
             
             {/* Acciones Rápidas */}
-            <div className="bg-white p-6 rounded-lg shadow-md">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-semibold text-blue-700 mb-4">Acciones Rápidas</h2>
               <div className="space-y-3">
-                <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+                <button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 font-medium flex items-center justify-center">
+                  <Plus className="mr-2 h-4 w-4" />
                   Agendar Nueva Cita
                 </button>
-                <button className="w-full bg-blue-100 text-blue-800 py-2 px-4 rounded-lg hover:bg-blue-200 transition duration-200 font-medium">
+                <button className="w-full bg-blue-100 text-blue-800 py-2 px-4 rounded-lg hover:bg-blue-200 transition duration-300 font-medium flex items-center justify-center">
+                  <Search className="mr-2 h-4 w-4" />
                   Buscar Profesionales
                 </button>
-                <button className="w-full border border-blue-600 text-blue-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-200 font-medium">
+                <button className="w-full border border-blue-600 text-blue-600 py-2 px-4 rounded-lg hover:bg-blue-50 transition duration-300 font-medium flex items-center justify-center">
+                  <Edit className="mr-2 h-4 w-4" />
                   Actualizar Perfil
                 </button>
               </div>
             </div>
 
             {/* Últimas Reseñas */}
-            <div className="bg-white p-6 rounded-lg shadow-md md:col-span-2 lg:col-span-3">
+            <div className="bg-white bg-opacity-70 backdrop-blur-sm p-6 rounded-lg shadow-md md:col-span-2 lg:col-span-3">
               <h2 className="text-xl font-semibold text-blue-700 mb-4">Mis Últimas Reseñas</h2>
               {reviews.length > 0 ? (
                 <ul className="space-y-4">
@@ -393,7 +402,8 @@ const UserDashboard: React.FC = () => {
               ) : (
                 <p className="text-gray-600">No has dejado ninguna reseña aún.</p>
               )}
-              <button className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-200 font-medium">
+              <button className="mt-4 w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-2 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 font-medium flex items-center justify-center">
+                <Star className="mr-2 h-4 w-4" />
                 Ver todas mis reseñas
               </button>
             </div>

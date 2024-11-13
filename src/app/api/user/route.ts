@@ -1,5 +1,3 @@
-export const dynamic = "force-static"; // Esto in
-
 import pool from '@/lib/db';   
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';

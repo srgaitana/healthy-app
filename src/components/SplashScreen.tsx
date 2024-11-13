@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react'
+'use client'
+
+import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { FaHeartbeat, FaCalendarAlt, FaUserMd, FaMobileAlt, FaStethoscope, FaBriefcaseMedical, FaClipboardCheck, FaHospitalAlt } from 'react-icons/fa'
+import { FaHeartbeat, FaCalendarAlt, FaUserMd, FaMobileAlt, FaStethoscope, FaBriefcaseMedical, FaClipboardCheck, FaHospitalAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import { useStore } from '@/store/useStore'
 import Logo from './Logo'
 
@@ -58,35 +60,58 @@ export default function SplashScreen() {
   const [fadeIn, setFadeIn] = useState(true)
   const [currentOnboardingSteps, setCurrentOnboardingSteps] = useState(patientOnboardingSteps)
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const autoPlayRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     setCurrentOnboardingSteps(isProfessional ? professionalOnboardingSteps : patientOnboardingSteps)
   }, [isProfessional])
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setFadeIn(false);
-      setTimeout(() => {
-        setCurrentStep((prevStep) => (prevStep + 1) % currentOnboardingSteps.length);
-        setFadeIn(true);
-      }, 500);
-    }, 6000);
+    startAutoPlay()
+    return () => stopAutoPlay()
+  }, [currentOnboardingSteps])
 
-    return () => clearInterval(timer);
-  }, [currentOnboardingSteps]);
+  const startAutoPlay = () => {
+    stopAutoPlay()
+    autoPlayRef.current = setInterval(() => {
+      goToNextStep()
+    }, 6000)
+  }
+
+  const stopAutoPlay = () => {
+    if (autoPlayRef.current) {
+      clearInterval(autoPlayRef.current)
+    }
+  }
+
+  const goToNextStep = () => {
+    setFadeIn(false)
+    setTimeout(() => {
+      setCurrentStep((prevStep) => (prevStep + 1) % currentOnboardingSteps.length)
+      setFadeIn(true)
+    }, 500)
+  }
+
+  const goToPrevStep = () => {
+    setFadeIn(false)
+    setTimeout(() => {
+      setCurrentStep((prevStep) => (prevStep - 1 + currentOnboardingSteps.length) % currentOnboardingSteps.length)
+      setFadeIn(true)
+    }, 500)
+  }
 
   const handleProfessionalToggle = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setFadeIn(false);
+    if (isTransitioning) return
+    setIsTransitioning(true)
+    setFadeIn(false)
     
     setTimeout(() => {
-      toggleProfessional();
-      setFadeIn(true);
-    }, 350);
+      toggleProfessional()
+      setFadeIn(true)
+    }, 350)
 
-    setTimeout(() => setIsTransitioning(false), 700);
-  };
+    setTimeout(() => setIsTransitioning(false), 700)
+  }
 
   return (
     <div className={`flex flex-col items-center justify-center min-h-screen transition-colors duration-700 ${
@@ -117,23 +142,45 @@ export default function SplashScreen() {
           </button>
         </div>
 
-        <div className="lg:hidden bg-white rounded-lg shadow-xl p-6 mb-8">
-          <div className={`transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
-            {currentOnboardingSteps[currentStep].icon}
-            <h2 className="text-2xl font-bold mb-2">{currentOnboardingSteps[currentStep].title}</h2>
-            <p className="text-gray-600">{currentOnboardingSteps[currentStep].description}</p>
+        <div className="lg:hidden mb-8">
+          <div className="bg-white rounded-lg shadow-xl p-6 relative">
+            <div className={`transition-opacity duration-500 ${fadeIn ? 'opacity-100' : 'opacity-0'}`}>
+              {currentOnboardingSteps[currentStep].icon}
+              <h2 className="text-2xl font-bold mb-2">{currentOnboardingSteps[currentStep].title}</h2>
+              <p className="text-gray-600">{currentOnboardingSteps[currentStep].description}</p>
+            </div>
           </div>
-          <div className="flex justify-center mt-4">
-            {currentOnboardingSteps.map((_, index) => (
-              <div
-                key={index}
-                className={`w-2 h-2 rounded-full mx-1 ${
-                  index === currentStep 
-                    ? (isProfessional ? 'bg-green-500' : 'bg-blue-500') 
-                    : 'bg-gray-300'
-                }`}
-              />
-            ))}
+          <div className="mt-4 flex justify-between items-center px-4">
+            <button
+              onClick={goToPrevStep}
+              className={`p-2 rounded-full ${
+                isProfessional ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+              } hover:bg-opacity-80 transition-colors duration-300`}
+              aria-label="Anterior"
+            >
+              <FaChevronLeft className="w-6 h-6" />
+            </button>
+            <div className="flex justify-center">
+              {currentOnboardingSteps.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full mx-1 ${
+                    index === currentStep 
+                      ? (isProfessional ? 'bg-green-500' : 'bg-blue-500') 
+                      : 'bg-gray-300'
+                  }`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={goToNextStep}
+              className={`p-2 rounded-full ${
+                isProfessional ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+              } hover:bg-opacity-80 transition-colors duration-300`}
+              aria-label="Siguiente"
+            >
+              <FaChevronRight className="w-6 h-6" />
+            </button>
           </div>
         </div>
 
